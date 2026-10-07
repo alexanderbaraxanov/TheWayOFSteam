@@ -134,7 +134,6 @@ int main() {
 
     Player player;
     playerInit(player);
-    Player* ptrPlayer = &player;
 
     sf::Clock clock;
 
@@ -176,8 +175,6 @@ int main() {
         {
             window.clear(sf::Color::Green);
         }
-
-        
         
         window.draw(*player.body.shape);
 
