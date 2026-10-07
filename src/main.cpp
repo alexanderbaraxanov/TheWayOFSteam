@@ -2,64 +2,8 @@
 #include <optional>
 #include <iostream>
 #include <memory>
-#include "createShape.hpp"
-
-struct Element {
-    std::unique_ptr<sf::Shape> shape = nullptr;
-    CreateShape::parametersShape parameters;
-};
-
-struct Player {
-    Element body;
-    float speed = 0.f;
-};
-
-void playerInit(Player& player) 
-{
-    std::unique_ptr<sf::RectangleShape> body = std::make_unique<sf::RectangleShape>();
-    player.body.parameters = {
-        .positionShape = {0.f, 0.f},
-        .colorShape = sf::Color::Black,
-        .colorLine = sf::Color::White,
-        .lineThinckness = 1,
-        .sizeRect = {50.f, 100.f},
-    };
-    CreateShape::setRect(*body, player.body.parameters);
-    player.body.shape = std::move(body);
-    player.speed = 300.f;
-}
-
-void playerUpdate(Player& player, float dt, sf::RenderWindow &window)
-{
-    sf::Vector2f nextPositionPlayer = player.body.parameters.positionShape;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-        {
-            nextPositionPlayer.y -= player.speed * dt;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-        {
-            nextPositionPlayer.x -= player.speed * dt;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-        {
-            nextPositionPlayer.y += player.speed * dt;     
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-        {
-            nextPositionPlayer.x += player.speed * dt;  
-        }
-
-        if((nextPositionPlayer.y >= 0 && nextPositionPlayer.y + player.body.parameters.sizeRect.y <= window.getSize().y) && (nextPositionPlayer.x >= 0 && nextPositionPlayer.x + player.body.parameters.sizeRect.x <= window.getSize().x))
-        {
-           player.body.parameters.positionShape = nextPositionPlayer;
-        }
-        else 
-        {
-            nextPositionPlayer = player.body.parameters.positionShape ;
-        }
-        player.body.shape->setPosition(player.body.parameters.positionShape);
-}
+#include "shapes/processShapes.hpp"
+#include "player/processPlayer.hpp"
 
 void closeWindow(sf::RenderWindow &window)
 {
@@ -69,7 +13,7 @@ void closeWindow(sf::RenderWindow &window)
 
 std::vector<std::unique_ptr<sf::Drawable>> createShapes()
 {
-    const CreateShape::parametersShape paramRectang = {
+    const ProcessShape::parametersShape paramRectang = {
         {200, 250},
         sf::Color::Yellow,
         sf::Color::White,
@@ -80,21 +24,21 @@ std::vector<std::unique_ptr<sf::Drawable>> createShapes()
     const float xPositionCircle = paramRectang.positionShape.x + (paramRectang.sizeRect.x / 6);
     const float yPositionCircle = paramRectang.positionShape.y + (paramRectang.sizeRect.y / 5) * 3.5;
 
-    const CreateShape::parametersShape paramConvex = {
+    const ProcessShape::parametersShape paramConvex = {
         {paramRectang.positionShape.x, paramRectang.positionShape.y},
         sf::Color::Yellow,
         sf::Color::White,
         3,
     };
 
-    const CreateShape::parametersShape paramCircle1 = {
+    const ProcessShape::parametersShape paramCircle1 = {
         {xPositionCircle, yPositionCircle},
         sf::Color::White,
         sf::Color::Black,
         5,
         radiusCircle: 18,
     };
-    const CreateShape::parametersShape paramCircle2 = {
+    const ProcessShape::parametersShape paramCircle2 = {
         {paramRectang.positionShape.x + (paramRectang.sizeRect.x / 6) * 4, yPositionCircle},
         sf::Color::White,
         sf::Color::Black,
@@ -102,10 +46,10 @@ std::vector<std::unique_ptr<sf::Drawable>> createShapes()
         radiusCircle: 18,
     };
 
-    std::unique_ptr<sf::RectangleShape> rectang = std::make_unique<sf::RectangleShape>(CreateShape::createRect(paramRectang));
-    std::unique_ptr<sf::ConvexShape> convex = std::make_unique<sf::ConvexShape>(CreateShape::createConvex(paramConvex));
-    std::unique_ptr<sf::CircleShape> circle1 = std::make_unique<sf::CircleShape>(CreateShape::createCirc(paramCircle1));
-    std::unique_ptr<sf::CircleShape> circle2 = std::make_unique<sf::CircleShape>(CreateShape::createCirc(paramCircle2));
+    std::unique_ptr<sf::RectangleShape> rectang = std::make_unique<sf::RectangleShape>(ProcessShape::createRect(paramRectang));
+    std::unique_ptr<sf::ConvexShape> convex = std::make_unique<sf::ConvexShape>(ProcessShape::createConvex(paramConvex));
+    std::unique_ptr<sf::CircleShape> circle1 = std::make_unique<sf::CircleShape>(ProcessShape::createCirc(paramCircle1));
+    std::unique_ptr<sf::CircleShape> circle2 = std::make_unique<sf::CircleShape>(ProcessShape::createCirc(paramCircle2));
     
     std::vector<std::unique_ptr<sf::Drawable>> shapes;
 
@@ -117,23 +61,14 @@ std::vector<std::unique_ptr<sf::Drawable>> createShapes()
     return shapes;
 }
 
-void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes)
-{
-    for(const std::unique_ptr<sf::Drawable>& shape : activeShapes)
-    {
-        window.draw(*shape);
-    }
-}
-
-
 int main() {
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML window");
     window.setKeyRepeatEnabled(false);
  
     bool changeColor = false; 
 
-    Player player;
-    playerInit(player);
+    Player::Player player;
+    Player::playerInit(player);
 
     sf::Clock clock;
 
@@ -165,7 +100,7 @@ int main() {
             }
         }
 
-        playerUpdate(player, dt, window);
+        Player::playerUpdate(player, dt, window);
         
         if(changeColor)
         {
@@ -178,7 +113,7 @@ int main() {
         
         window.draw(*player.body.shape);
 
-        drawShapes(window, activeShapes);
+        ProcessShape::drawShapes(window, activeShapes);
 
         window.display();
     }

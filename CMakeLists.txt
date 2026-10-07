@@ -9,6 +9,7 @@ find_package(SFML 3 COMPONENTS Window Graphics System REQUIRED)
 add_executable(
     app 
     src/main.cpp
-    src/createShape.cpp
+    src/shapes/processShapes.cpp
+    src/player/processPlayer.cpp 
 )
 target_link_libraries(app PRIVATE SFML::Window SFML::Graphics SFML::System)

@@ -1,8 +1,8 @@
-#include "createShape.hpp"
+#include "processShapes.hpp"
 #include <optional>
 #include <SFML/Graphics.hpp>
 
-namespace CreateShape
+namespace ProcessShape
 {
     void setShape(sf::Shape &shape, const parametersShape &parametersShape)
     {
@@ -12,19 +12,18 @@ namespace CreateShape
         shape.setOutlineThickness(parametersShape.lineThinckness);
     }
 
-    sf::RectangleShape createRect(const parametersShape &parameters)
-    {
-        sf::RectangleShape rectang;
-        rectang.setSize(parameters.sizeRect);
-        setShape(rectang, parameters);
-
-        return rectang;
-    }
-
     void setRect(sf::RectangleShape& rectang, const parametersShape &parameters)
     {
         rectang.setSize(parameters.sizeRect);
         setShape(rectang, parameters);
+    }
+
+    sf::RectangleShape createRect(const parametersShape &parameters)
+    {
+        sf::RectangleShape rectang;
+        setRect(rectang, parameters);
+
+        return rectang;
     }
 
     sf::CircleShape createCirc(const parametersShape &parameters)
@@ -49,5 +48,13 @@ namespace CreateShape
         setShape(convex, parameters);
 
         return convex;
+    }
+
+    void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes)
+    {
+        for(const std::unique_ptr<sf::Drawable>& shape : activeShapes)
+        {
+            window.draw(*shape);
+        }
     }
 }
