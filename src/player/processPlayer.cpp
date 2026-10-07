@@ -1,19 +1,10 @@
 #include "../shapes/processShapes.hpp"
+#include "processPlayer.hpp"
 #include <optional>
 #include <SFML/Graphics.hpp>
 
 namespace Player
 {
-    struct Element {
-        std::unique_ptr<sf::Shape> shape = nullptr;
-        ProcessShape::parametersShape parameters;
-    };
-
-    struct Player {
-        Element body;
-        float speed = 0.f;
-    };
-
     void playerInit(Player& player) 
     {
         std::unique_ptr<sf::RectangleShape> body = std::make_unique<sf::RectangleShape>();
@@ -29,35 +20,48 @@ namespace Player
         player.speed = 300.f;
     }
 
+    void playerMoving(sf::Vector2f& nextPos , Player& player, float dt) 
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+        {
+            nextPos.x -= player.speed * dt;    
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+        {
+            nextPos.x += player.speed * dt;  
+        }
+    }
+
+    bool checkPosX(sf::Vector2f& nextPos , Player& player, sf::RenderWindow &window)
+    {
+        return (nextPos.x >= 0 && nextPos.x + player.body.parameters.sizeRect.x <= window.getSize().x);
+    }
+
+    bool checkPosY(sf::Vector2f& nextPos , Player& player, sf::RenderWindow &window)
+    {
+        return (nextPos.y >= 0 && nextPos.y + player.body.parameters.sizeRect.y <= window.getSize().y) ;  
+    }
+
+    void checkPosOnWindow (sf::Vector2f& nextPos , Player& player, sf::RenderWindow &window)
+    {
+        if(checkPosX(nextPos, player, window) && checkPosY(nextPos, player, window))
+        {
+            player.body.parameters.positionShape = nextPos;
+        }
+        else 
+        {
+            nextPos = player.body.parameters.positionShape ;
+        }
+    }
+
     void playerUpdate(Player& player, float dt, sf::RenderWindow &window)
     {
-        sf::Vector2f nextPositionPlayer = player.body.parameters.positionShape;
+        sf::Vector2f nextPosPlayer = player.body.parameters.positionShape;
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-            {
-                nextPositionPlayer.y -= player.speed * dt;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-            {
-                nextPositionPlayer.x -= player.speed * dt;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-            {
-                nextPositionPlayer.y += player.speed * dt;     
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-            {
-                nextPositionPlayer.x += player.speed * dt;  
-            }
+        playerMoving(nextPosPlayer, player, dt);
 
-            if((nextPositionPlayer.y >= 0 && nextPositionPlayer.y + player.body.parameters.sizeRect.y <= window.getSize().y) && (nextPositionPlayer.x >= 0 && nextPositionPlayer.x + player.body.parameters.sizeRect.x <= window.getSize().x))
-            {
-            player.body.parameters.positionShape = nextPositionPlayer;
-            }
-            else 
-            {
-                nextPositionPlayer = player.body.parameters.positionShape ;
-            }
-            player.body.shape->setPosition(player.body.parameters.positionShape);
+        checkPosOnWindow(nextPosPlayer, player, window);
+        
+        player.body.shape->setPosition(player.body.parameters.positionShape);
     }
 }

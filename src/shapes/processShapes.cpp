@@ -18,6 +18,13 @@ namespace ProcessShape
         setShape(rectang, parameters);
     }
 
+    void setCircle(sf::CircleShape& circle, const parametersShape &parameters)
+    {
+        circle.setRadius(parameters.radiusCircle);
+        setShape(circle, parameters);
+    }
+
+
     sf::RectangleShape createRect(const parametersShape &parameters)
     {
         sf::RectangleShape rectang;
@@ -29,8 +36,7 @@ namespace ProcessShape
     sf::CircleShape createCirc(const parametersShape &parameters)
     {
         sf::CircleShape circle;
-        circle.setRadius(parameters.radiusCircle);
-        setShape(circle, parameters);
+        setCircle(circle, parameters);
 
         return circle;
     }

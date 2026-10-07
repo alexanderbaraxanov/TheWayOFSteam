@@ -110,11 +110,10 @@ int main() {
         {
             window.clear(sf::Color::Green);
         }
-        
-        window.draw(*player.body.shape);
 
         ProcessShape::drawShapes(window, activeShapes);
-
+        window.draw(*player.body.shape);
+    
         window.display();
     }
 
