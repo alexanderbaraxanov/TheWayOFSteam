@@ -1,11 +1,10 @@
 #include "createShape.hpp"
-
-#include <SFML/Graphics.hpp>
 #include <optional>
+#include <SFML/Graphics.hpp>
 
 namespace CreateShape
-{  
-    void setShape(sf::Shape& shape, const settingsShape& parametersShape) 
+{
+    void setShape(sf::Shape &shape, const parametersShape &parametersShape)
     {
         shape.setPosition(parametersShape.positionShape);
         shape.setFillColor(parametersShape.colorShape);
@@ -13,30 +12,34 @@ namespace CreateShape
         shape.setOutlineThickness(parametersShape.lineThinckness);
     }
 
-    sf::RectangleShape createRect(const sf::Vector2f size, const settingsShape& parameters) 
+    sf::RectangleShape createRect(const parametersShape &parameters)
     {
         sf::RectangleShape rectang;
-        rectang.setSize(size);  
+        rectang.setSize(parameters.sizeRect);
         setShape(rectang, parameters);
 
         return rectang;
     }
 
-    sf::CircleShape createCirc(const float radius, const settingsShape& parameters) 
+    void setRect(sf::RectangleShape& rectang, const parametersShape &parameters)
+    {
+        rectang.setSize(parameters.sizeRect);
+        setShape(rectang, parameters);
+    }
+
+    sf::CircleShape createCirc(const parametersShape &parameters)
     {
         sf::CircleShape circle;
-        circle.setRadius(radius); 
+        circle.setRadius(parameters.radiusCircle);
         setShape(circle, parameters);
 
         return circle;
     }
 
-    sf::ConvexShape createConvex(const settingsShape& parameters)
+    sf::ConvexShape createConvex(const parametersShape &parameters)
     {
         sf::ConvexShape convex;
         convex.setPointCount(4);
-        const float x = parameters.positionShape.x;
-        const float y = parameters.positionShape.y;
 
         convex.setPoint(0, {60, -3});
         convex.setPoint(1, {200, -3});
