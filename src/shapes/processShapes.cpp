@@ -2,7 +2,7 @@
 #include <optional>
 #include <SFML/Graphics.hpp>
 
-namespace ProcessShape
+namespace Shape
 {
     void setShape(sf::Shape &shape, const parametersShape &parametersShape)
     {
@@ -39,21 +39,6 @@ namespace ProcessShape
         setCircle(circle, parameters);
 
         return circle;
-    }
-
-    sf::ConvexShape createConvex(const parametersShape &parameters)
-    {
-        sf::ConvexShape convex;
-        convex.setPointCount(4);
-
-        convex.setPoint(0, {60, -3});
-        convex.setPoint(1, {200, -3});
-        convex.setPoint(2, {160, -50});
-        convex.setPoint(3, {70, -50});
-
-        setShape(convex, parameters);
-
-        return convex;
     }
 
     void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes)
