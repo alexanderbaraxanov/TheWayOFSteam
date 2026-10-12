@@ -2,12 +2,11 @@
 
 #include <SFML/Graphics.hpp>
 
-namespace Shape
+namespace ProcessShape
 {
     struct parametersShape {
         sf::Vector2f positionShape = {0.f, 0.f};
         sf::Color colorShape = sf::Color::Transparent; 
-        sf::Texture textureShape;
         sf::Color colorLine = sf::Color::Transparent;
         float lineThinckness = 0.f;
         float radiusCircle = 0.f;
@@ -17,5 +16,6 @@ namespace Shape
     void setRect(sf::RectangleShape& rectang, const parametersShape &parameters);
     sf::RectangleShape createRect(const parametersShape& parameters);
     sf::CircleShape createCirc(const parametersShape& parameters);
+    sf::ConvexShape createConvex(const parametersShape& parameters);
     void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes);
 }

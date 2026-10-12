@@ -5,30 +5,74 @@
 #include "shapes/processShapes.hpp"
 #include "player/processPlayer.hpp"
 
-struct Settings {
-    const sf::Vector2u WINDOW_SIZE = {0, 0};
-    const std::string NAME_WINDOW = "SFML window";
-};
-
-const Settings SETTINGS_GAME = {
-    {800,600},
-    "The Way of Steam",
-};
-
 void closeWindow(sf::RenderWindow &window)
 {
     window.close();
     std::cout << "Close window" << std::endl;
 }
 
+std::vector<std::unique_ptr<sf::Drawable>> createShapes()
+{
+    const ProcessShape::parametersShape paramRectang = {
+        {200, 250},
+        sf::Color::Yellow,
+        sf::Color::White,
+        3,
+        sizeRect: {300, 50}
+    };
+
+    const float xPositionCircle = paramRectang.positionShape.x + (paramRectang.sizeRect.x / 6);
+    const float yPositionCircle = paramRectang.positionShape.y + (paramRectang.sizeRect.y / 5) * 3.5;
+
+    const ProcessShape::parametersShape paramConvex = {
+        {paramRectang.positionShape.x, paramRectang.positionShape.y},
+        sf::Color::Yellow,
+        sf::Color::White,
+        3,
+    };
+
+    const ProcessShape::parametersShape paramCircle1 = {
+        {xPositionCircle, yPositionCircle},
+        sf::Color::White,
+        sf::Color::Black,
+        5,
+        radiusCircle: 18,
+    };
+    const ProcessShape::parametersShape paramCircle2 = {
+        {paramRectang.positionShape.x + (paramRectang.sizeRect.x / 6) * 4, yPositionCircle},
+        sf::Color::White,
+        sf::Color::Black,
+        5,
+        radiusCircle: 18,
+    };
+
+    std::unique_ptr<sf::RectangleShape> rectang = std::make_unique<sf::RectangleShape>(ProcessShape::createRect(paramRectang));
+    std::unique_ptr<sf::ConvexShape> convex = std::make_unique<sf::ConvexShape>(ProcessShape::createConvex(paramConvex));
+    std::unique_ptr<sf::CircleShape> circle1 = std::make_unique<sf::CircleShape>(ProcessShape::createCirc(paramCircle1));
+    std::unique_ptr<sf::CircleShape> circle2 = std::make_unique<sf::CircleShape>(ProcessShape::createCirc(paramCircle2));
+    
+    std::vector<std::unique_ptr<sf::Drawable>> shapes;
+
+    shapes.push_back(std::move(rectang));
+    shapes.push_back(std::move(convex));
+    shapes.push_back(std::move(circle1));
+    shapes.push_back(std::move(circle2));
+
+    return shapes;
+}
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode(SETTINGS_GAME.WINDOW_SIZE), SETTINGS_GAME.NAME_WINDOW);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML window");
     window.setKeyRepeatEnabled(false);
+ 
+    bool changeColor = false; 
 
     Player::Player player;
     Player::playerInit(player);
 
     sf::Clock clock;
+
+    std::vector<std::unique_ptr<sf::Drawable>> activeShapes = createShapes();
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -43,9 +87,11 @@ int main() {
             if (event->is<sf::Event::KeyPressed>())
             {
                 const sf::Event::KeyPressed* pressedKey = event->getIf<sf::Event::KeyPressed>();
-
-                Player::playerJump(player, pressedKey);
-                Player::playerJerk(player, pressedKey, dt);
+                if (pressedKey->code == sf::Keyboard::Key::Space)
+                {
+                    changeColor = !changeColor;
+                    std::cout << "Change color: " << changeColor << std::endl;
+                }
 
                 if (pressedKey->code == sf::Keyboard::Key::Escape)
                 {
@@ -53,19 +99,21 @@ int main() {
                 }
             }
         }
-        
-        window.clear(sf::Color::White);
 
         Player::playerUpdate(player, dt, window);
-        const Shape::parametersShape paramFloar = {
-            .positionShape = {0.f, 250.f + player.body.parameters.sizeRect.y},
-            .colorShape = sf::Color::Green,
-            .sizeRect = {SETTINGS_GAME.WINDOW_SIZE.x, SETTINGS_GAME.WINDOW_SIZE.y - 250  - player.body.parameters.sizeRect.y},
-        };
-        const sf::RectangleShape floar = Shape::createRect(paramFloar);
+        
+        if(changeColor)
+        {
+            window.clear(sf::Color::Blue);
+        }
+        else
+        {
+            window.clear(sf::Color::Green);
+        }
 
-        window.draw(floar);
+        ProcessShape::drawShapes(window, activeShapes);
         window.draw(*player.body.shape);
+    
         window.display();
     }
 
