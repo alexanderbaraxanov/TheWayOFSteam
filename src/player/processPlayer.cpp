@@ -13,14 +13,30 @@ namespace Player
 
     void playerInit(Player& player) 
     {
+        Element playerBody; 
+        Element playerHead;
+
         std::unique_ptr<sf::RectangleShape> body = std::make_unique<sf::RectangleShape>();
-        player.body.parameters = {
+        std::unique_ptr<sf::RectangleShape> head = std::make_unique<sf::RectangleShape>();
+
+        playerBody.parameters = {
             .positionShape = {10.f, 250.f},
             .colorShape = sf::Color::Black,
-            .sizeRect = {25.f, 30.f},
+            .sizeRect = {26.f, 30.f},
         };
-        Shape::setRect(*body, player.body.parameters);
-        player.body.shape = std::move(body);
+        Shape::setRect(*body, playerBody.parameters);
+        playerBody.shape = std::move(body);
+        player.body.push_back(std::move(playerBody));
+
+        playerHead.parameters = {
+            .positionShape = {playerBody.parameters.positionShape.x + 8.f, playerBody.parameters.positionShape.y - 10.f},
+            .colorShape = sf::Color::Black,
+            .sizeRect = {10.f, 15.f},
+        };
+        Shape::setRect(*head, playerHead.parameters);
+        playerHead.shape = std::move(head);
+        player.body.push_back(std::move(playerHead));
+
         player.maxSpeed = 300.f;
         player.acceleration = 1800.f;
         player.friction = 1500.f;
@@ -28,30 +44,25 @@ namespace Player
 
     bool checkPosX(const float nextPosX, const Player& player, const sf::RenderWindow &window)
     {
-        return (nextPosX > 0 && nextPosX + player.body.parameters.sizeRect.x < window.getSize().x) ;  
-    }
-
-    bool checkPosY(const float nextPosY, const Player& player, const sf::RenderWindow &window)
-    {
-        return (nextPosY > 0 && nextPosY + player.body.parameters.sizeRect.y < window.getSize().y) ;  
+        return (nextPosX > 0 && nextPosX + player.body[0].parameters.sizeRect.x < window.getSize().x) ;  
     }
 
     void playerMoving(Player& player, const sf::RenderWindow &window, const float dt) 
     {
-        float dirMoving = 0.f;
+        player.direction.x = 0.f;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
         {
-            dirMoving -= 1.f;    
+            player.direction.x -= 1.f;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
         {
-            dirMoving += 1.f;  
+            player.direction.x += 1.f;  
         }
 
-        if (dirMoving != 0.f)
+        if (player.direction.x != 0.f)
         {
-            player.speed.x += dirMoving * player.acceleration * dt;
+            player.speed.x += player.direction.x * player.acceleration * dt;
         }
         else
         {
@@ -80,11 +91,11 @@ namespace Player
         if (!player.isGround)
         {
             player.speed.y += player.gravity * dt;
-            player.body.parameters.positionShape.y += player.speed.y * dt;
+            player.body[0].parameters.positionShape.y += player.speed.y * dt;
         
-            if (player.body.parameters.positionShape.y >= GROUND_LEVEL)
+            if (player.body[0].parameters.positionShape.y >= GROUND_LEVEL)
             {
-                player.body.parameters.positionShape.y = GROUND_LEVEL; 
+                player.body[0].parameters.positionShape.y = GROUND_LEVEL; 
                 player.isGround = true;
                 player.speed.y = 0.f;
             }
@@ -123,12 +134,12 @@ namespace Player
         playerMoving(player, window, dt);
         playerJumping(player, dt);
 
-        sf::Vector2f nextPos = player.body.parameters.positionShape;
+        sf::Vector2f nextPos = player.body[0].parameters.positionShape;
         nextPos.x += player.speed.x * dt;
 
         if (checkPosX(nextPos.x, player, window))
         {
-            player.body.parameters.positionShape = nextPos;
+            player.body[0].parameters.positionShape = nextPos;
         }
         else
         {
@@ -140,6 +151,17 @@ namespace Player
             player.jerkTimer -= dt;
         }
         
-        player.body.shape->setPosition(player.body.parameters.positionShape);
+        player.body[1].parameters.positionShape.y = player.body[0].parameters.positionShape.y - 10.f;
+        if (player.speed.x > 0)
+        {
+            player.body[1].parameters.positionShape.x = player.body[0].parameters.positionShape.x + 12.f;
+        }
+        else if (player.speed.x < 0)
+        {
+            player.body[1].parameters.positionShape.x = player.body[0].parameters.positionShape.x + 4.f;
+        }
+
+        player.body[0].shape->setPosition(player.body[0].parameters.positionShape);
+        player.body[1].shape->setPosition(player.body[1].parameters.positionShape);
     }
 }

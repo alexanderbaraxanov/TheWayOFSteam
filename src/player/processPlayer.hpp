@@ -10,8 +10,9 @@ namespace Player
     };
 
     struct Player {
-        Element body;
+        std::vector<Element> body;
         sf::Vector2f speed = {0.f, 0.f};
+        sf::Vector2f direction = {0.f, 0.f};
         float maxSpeed = 0.f;
         int countJerk = 2;
         float jerkTimer = 0.f;

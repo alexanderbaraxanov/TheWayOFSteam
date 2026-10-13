@@ -58,14 +58,21 @@ int main() {
 
         Player::playerUpdate(player, dt, window);
         const Shape::parametersShape paramFloar = {
-            .positionShape = {0.f, 250.f + player.body.parameters.sizeRect.y},
+            .positionShape = {
+                0.f,
+                250.f + player.body[0].parameters.sizeRect.y,
+            },
             .colorShape = sf::Color::Green,
-            .sizeRect = {SETTINGS_GAME.WINDOW_SIZE.x, SETTINGS_GAME.WINDOW_SIZE.y - 250  - player.body.parameters.sizeRect.y},
+            .sizeRect = {
+                static_cast<float>(SETTINGS_GAME.WINDOW_SIZE.x), 
+                static_cast<float>(SETTINGS_GAME.WINDOW_SIZE.y) - 250  - player.body[0].parameters.sizeRect.y
+            },
         };
         const sf::RectangleShape floar = Shape::createRect(paramFloar);
 
         window.draw(floar);
-        window.draw(*player.body.shape);
+        window.draw(*player.body[0].shape);
+        window.draw(*player.body[1].shape);
         window.display();
     }
 
