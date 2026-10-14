@@ -6,7 +6,7 @@ namespace Player
 {
     struct Element {
         std::unique_ptr<sf::Shape> shape = nullptr;
-        Shape::parametersShape parameters;
+        Shape::ParametersShape parameters;
     };
 
     struct Player {
@@ -23,8 +23,8 @@ namespace Player
         float gravity = 0.f;
     };
 
-    void playerInit(Player& player) ;
-    void playerUpdate(Player& player, const float dt, const sf::RenderWindow &window);
-    void playerJump(Player& player, const sf::Event::KeyPressed* pressedKey);
-    void playerJerk(Player& player, const sf::Event::KeyPressed* pressedKey, const float dt);
+    void PlayerInit(Player& player) ;
+    void PlayerUpdate(Player& player, const float dt, const sf::RenderWindow &window);
+    void PlayerJump(Player& player, const sf::Event::KeyPressed* pressedKey);
+    void PlayerJerk(Player& player, const sf::Event::KeyPressed* pressedKey, const float dt);
 }

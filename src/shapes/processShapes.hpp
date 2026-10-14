@@ -4,7 +4,7 @@
 
 namespace Shape
 {
-    struct parametersShape {
+    struct ParametersShape {
         sf::Vector2f positionShape = {0.f, 0.f};
         sf::Color colorShape = sf::Color::Transparent; 
         sf::Texture textureShape;
@@ -14,8 +14,8 @@ namespace Shape
         sf::Vector2f sizeRect = {0.f, 0.f};
     };
 
-    void setRect(sf::RectangleShape& rectang, const parametersShape &parameters);
-    sf::RectangleShape createRect(const parametersShape& parameters);
-    sf::CircleShape createCirc(const parametersShape& parameters);
-    void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes);
+    void SetRect(sf::RectangleShape& rectang, const ParametersShape &parameters);
+    sf::RectangleShape CreateRect(const ParametersShape& parameters);
+    sf::CircleShape CreateCirc(const ParametersShape& parameters);
+    void DrawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes);
 }

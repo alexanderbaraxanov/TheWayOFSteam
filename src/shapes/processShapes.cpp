@@ -4,7 +4,7 @@
 
 namespace Shape
 {
-    void setShape(sf::Shape &shape, const parametersShape &parametersShape)
+    void SetShape(sf::Shape &shape, const ParametersShape &parametersShape)
     {
         shape.setPosition(parametersShape.positionShape);
         shape.setFillColor(parametersShape.colorShape);
@@ -12,36 +12,36 @@ namespace Shape
         shape.setOutlineThickness(parametersShape.lineThinckness);
     }
 
-    void setRect(sf::RectangleShape& rectang, const parametersShape &parameters)
+    void SetRect(sf::RectangleShape& rectang, const ParametersShape &parameters)
     {
         rectang.setSize(parameters.sizeRect);
-        setShape(rectang, parameters);
+        SetShape(rectang, parameters);
     }
 
-    void setCircle(sf::CircleShape& circle, const parametersShape &parameters)
+    void SetCircle(sf::CircleShape& circle, const ParametersShape &parameters)
     {
         circle.setRadius(parameters.radiusCircle);
-        setShape(circle, parameters);
+        SetShape(circle, parameters);
     }
 
 
-    sf::RectangleShape createRect(const parametersShape &parameters)
+    sf::RectangleShape CreateRect(const ParametersShape &parameters)
     {
         sf::RectangleShape rectang;
-        setRect(rectang, parameters);
+        SetRect(rectang, parameters);
 
         return rectang;
     }
 
-    sf::CircleShape createCirc(const parametersShape &parameters)
+    sf::CircleShape CreateCirc(const ParametersShape &parameters)
     {
         sf::CircleShape circle;
-        setCircle(circle, parameters);
+        SetCircle(circle, parameters);
 
         return circle;
     }
 
-    void drawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes)
+    void DrawShapes(sf::RenderWindow& window, std::vector<std::unique_ptr<sf::Drawable>>& activeShapes)
     {
         for(const std::unique_ptr<sf::Drawable>& shape : activeShapes)
         {

@@ -26,7 +26,7 @@ int main() {
     window.setKeyRepeatEnabled(false);
 
     Player::Player player;
-    Player::playerInit(player);
+    Player::PlayerInit(player);
 
     sf::Clock clock;
 
@@ -44,8 +44,8 @@ int main() {
             {
                 const sf::Event::KeyPressed* pressedKey = event->getIf<sf::Event::KeyPressed>();
 
-                Player::playerJump(player, pressedKey);
-                Player::playerJerk(player, pressedKey, dt);
+                Player::PlayerJump(player, pressedKey);
+                Player::PlayerJerk(player, pressedKey, dt);
 
                 if (pressedKey->code == sf::Keyboard::Key::Escape)
                 {
@@ -56,8 +56,8 @@ int main() {
         
         window.clear(sf::Color::White);
 
-        Player::playerUpdate(player, dt, window);
-        const Shape::parametersShape paramFloar = {
+        Player::PlayerUpdate(player, dt, window);
+        const Shape::ParametersShape paramFloar = {
             .positionShape = {
                 0.f,
                 250.f + player.body[0].parameters.sizeRect.y,
@@ -68,7 +68,7 @@ int main() {
                 static_cast<float>(SETTINGS_GAME.WINDOW_SIZE.y) - 250  - player.body[0].parameters.sizeRect.y
             },
         };
-        const sf::RectangleShape floar = Shape::createRect(paramFloar);
+        const sf::RectangleShape floar = Shape::CreateRect(paramFloar);
 
         window.draw(floar);
         window.draw(*player.body[0].shape);
