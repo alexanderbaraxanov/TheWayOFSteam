@@ -16,6 +16,7 @@ struct Map {
 
     Map(const std::vector<std::string>& tileMap);
     void Draw(sf::RenderWindow& window) const;
+
     TileType GetTile(float worldX, float worldY) const;
     bool IsSolid (float worldX, float worldY) const;
     bool IsSpike(float worldX, float worldY) const;

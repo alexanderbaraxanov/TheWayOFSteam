@@ -5,7 +5,7 @@ bool CheckPos(float worldPos, float boundMap)
     return (worldPos < 0 || worldPos > boundMap * TILE_SIZE);
 }
 
-sf::Texture CheckAndLoadTexture(const std::string& filepath)
+static sf::Texture CheckAndLoadTexture(const std::string& filepath)
 {
     sf::Texture texture;
     if (!texture.loadFromFile(filepath)) 
@@ -88,7 +88,7 @@ void Map::Draw(sf::RenderWindow& window) const
 {
     sf::Sprite tileSprite(tilesetTexture);
 
-    const uint32_t atlasColumns = 2; 
+    const uint32_t atlasColumns = tilesetTexture.getSize().x / TILE_SIZE; 
 
     for (size_t i = 0; i < grid.size(); ++i) {
         if (grid[i] == TileType::Empty) continue;
