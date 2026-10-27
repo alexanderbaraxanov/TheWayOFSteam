@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "TileType.hpp"
 
 constexpr uint32_t TILE_SIZE = 50; 
@@ -20,4 +21,5 @@ struct Map {
     TileType GetTile(float worldX, float worldY) const;
     bool IsSolid (float worldX, float worldY) const;
     bool IsSpike(float worldX, float worldY) const;
+    std::vector<sf::FloatRect> GetNearbySolidTiles(const sf::FloatRect& bounds) const;
 };

@@ -104,3 +104,23 @@ void Map::Draw(sf::RenderWindow& window) const
         window.draw(tileSprite);
     }
 }
+
+std::vector<sf::FloatRect> Map::GetNearbySolidTiles(const sf::FloatRect& bounds) const {
+    std::vector<sf::FloatRect> nearbyTiles;
+    const int minCol = std::clamp(static_cast<int>(bounds.position.x / TILE_SIZE), 0, static_cast<int>(width - 1));
+    const int maxCol = std::clamp(static_cast<int>((bounds.position.x + bounds.size.x) / TILE_SIZE), 0, static_cast<int>(width - 1));
+    const int minRow = std::clamp(static_cast<int>(bounds.position.y / TILE_SIZE), 0, static_cast<int>(height - 1));
+    const int maxRow = std::clamp(static_cast<int>((bounds.position.y + bounds.size.y) / TILE_SIZE), 0, static_cast<int>(height - 1));
+
+    for (int r = minRow; r <= maxRow; ++r) {
+        for (int c = minCol; c <= maxCol; ++c) {
+            if (grid[r * width + c] == TileType::Solid || grid[r * width + c] == TileType::Platform) {
+                nearbyTiles.emplace_back(
+                    sf::Vector2f{static_cast<float>(c * TILE_SIZE), static_cast<float>(r * TILE_SIZE)}, 
+                    sf::Vector2f{static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)}
+                );
+            }
+        }
+    }
+   return nearbyTiles;
+}

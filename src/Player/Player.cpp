@@ -1,20 +1,13 @@
 #include "Player.hpp"
 
 constexpr float ACCELERATION = 1800.0f;
-constexpr float MAX_SPEED = 300.0f;
+constexpr float MAX_SPEED = 400.0f;
 constexpr float FRICTION = 0.2f;
 
 constexpr float GROUND_LEVEL = 251.f;
 constexpr float POWER_JUMP = -600.f;
-constexpr float GRAVITY_UP = 2000.f;
-constexpr float GRAVITY_DOWN = 1500.f;
-
-
-bool CheckPosX(const float x, const Player& player, const sf::RenderWindow &window)
-{
-    float offsetX = player.hitbox.size.x / 2.f;
-    return (x - offsetX > 0 && x + offsetX < static_cast<float>(window.getSize().x));
-}
+constexpr float GRAVITY_UP = 1200.f;
+constexpr float GRAVITY_DOWN = 1000.f;
 
 void AccelerationPlayer(Player& player, float dt, bool& isMoving)
 {
@@ -46,57 +39,23 @@ void CheckMaxVelocity(Player& player)
     }
 }
 
-void CheckXBoundaries(Player& player, const sf::RenderWindow &window, float dt)
-{
-    float offsetX = player.sprite.getPosition().x + player.velocity.x * dt;
-
-    if (CheckPosX(offsetX, player, window))
-    {
-        player.sprite.move({offsetX - player.sprite.getPosition().x, 0.f});
-    }
-    else
-    {
-        player.velocity.x = 0.f;
-    }
-}
-
 void PlayerMoving(Player& player, const sf::RenderWindow &window, float dt)
 {
     bool isMoving = false;
     AccelerationPlayer(player, dt, isMoving);
     FrictionPlayer(player, isMoving);
     CheckMaxVelocity(player);
-    CheckXBoundaries(player, window, dt);
 }
 
 void GravityPlayer(Player& player, const float dt) 
 {
     player.gravity = (player.velocity.y < 0.f) ? GRAVITY_UP : GRAVITY_DOWN;
-    if (!player.isGround)
-    {
-        player.velocity.y += player.gravity * dt;
-    }
-}
-
-void CheckYBoundaries(Player& player, float dt)
-{
-    float offsetY = 0.f;
-    if (player.velocity.y >= 0.f && player.hitbox.position.y >=  GROUND_LEVEL) 
-    {
-        offsetY = GROUND_LEVEL - player.hitbox.position.y;
-        player.velocity.y = 0.0f;
-        player.isGround = true;
-    } else {
-        player.isGround = false;
-        offsetY = player.velocity.y * dt;
-    }
-    player.sprite.move({0.f, offsetY});
+    player.velocity.y += player.gravity * dt;
 }
 
 void PlayerJumping(Player& player, const float dt)
 {
     GravityPlayer(player, dt);
-    CheckYBoundaries(player, dt);
 }
 
 void SpriteFlipping(Player& player)
@@ -133,34 +92,10 @@ Player::Player()
     : texture(CheckAndLoadTexture("../assets/enemy_1_2.png"))
     , sprite(texture)
 {
+    health = 100.f;
     sprite.setOrigin({sprite.getLocalBounds().size.x / 2.0f, sprite.getLocalBounds().size.y / 2.0f});
-    hitbox.size = static_cast<sf::Vector2f>(texture.getSize());
-    float offsetHeight = hitbox.size.y / 2.f;
-    float offsetWidth = hitbox.size.x / 2.f;
-
-    sprite.setPosition({offsetWidth, GROUND_LEVEL + offsetHeight});
-    UpdateHitbox();
+    sprite.setPosition({100.f, 800.f}); 
 }    
-
-void Player::Update(sf::RenderWindow &window, const float dt)
-{
-    PlayerMoving(*this, window, dt);
-    PlayerJumping(*this, dt);
-    SpriteFlipping(*this);
-    UpdateJerkTimer(jerkTimer, dt);
-    UpdateHitbox();
-}
-
-void Player::UpdateHitbox()
-{
-    sf::Vector2f spritePos = sprite.getPosition();
-    hitbox.position = {spritePos.x - hitbox.size.x / 2.f, spritePos.y - hitbox.size.y / 2.f,};
-}
-
-void Player::Draw(sf::RenderWindow &window) const
-{
-    window.draw(sprite);
-}
 
 void Player::Jump(const sf::Event::KeyPressed* pressedKey)
 {
@@ -186,4 +121,98 @@ void Player::Jerk(const sf::Event::KeyPressed* pressedKey)
             jerkTimer = 0.1f;
         }
     }
+}
+
+bool CheckCollision(const sf::FloatRect& a, const sf::FloatRect& b) {
+   return a.findIntersection(b).has_value();
+}
+
+void Player::ResolveCollisionsX(const Map& map) {
+   sf::FloatRect bounds = sprite.getGlobalBounds();
+  
+   for (const auto& tileRect : map.GetNearbySolidTiles(bounds)) {
+        if (CheckCollision(bounds, tileRect)) 
+        {
+            float playerCenterX = sprite.getPosition().x;
+            float tileCenterX = tileRect.position.x + tileRect.size.x / 2.0f;
+            if (velocity.x > 0.0f || (velocity.x == 0.0f && playerCenterX < tileCenterX)) {
+                sprite.setPosition({tileRect.position.x - bounds.size.x / 2.0f - EPSILON, sprite.getPosition().y});
+            } 
+            else if (velocity.x < 0.0f || (velocity.x == 0.0f && playerCenterX > tileCenterX)) 
+            {
+                sprite.setPosition({tileRect.position.x + tileRect.size.x + bounds.size.x / 2.0f + EPSILON, sprite.getPosition().y});
+            }
+            velocity.x = 0.0f; 
+            break;
+        }
+
+   }
+}
+
+void Player::ResolveCollisionsY(const Map& map) {
+   sf::FloatRect bounds = sprite.getGlobalBounds();
+   isGround = false; 
+
+    for (const auto& tileRect : map.GetNearbySolidTiles(bounds)) {
+        if (CheckCollision(bounds, tileRect)) 
+        {
+            if (velocity.y > 0.0f || (velocity.y == 0.0f && sprite.getPosition().y < tileRect.position.y)) 
+            { 
+                sprite.setPosition({sprite.getPosition().x, tileRect.position.y - bounds.size.y / 2.0f});
+                isGround = true;   
+            } 
+            else if (velocity.y < 0.0f) 
+            { 
+                sprite.setPosition({sprite.getPosition().x, tileRect.position.y + tileRect.size.y + bounds.size.y / 2.0f + EPSILON});
+            }
+            velocity.y = 0.0f;
+            break;
+        }
+    }
+}
+
+void CheckOneWayPlatform(Player& player, sf::FloatRect tileRect, float prevBottom) {
+   sf::FloatRect bounds = player.sprite.getGlobalBounds();
+
+    if (player.velocity.y > 0.0f) {
+        if (prevBottom <= tileRect.position.y + EPSILON) {
+            if (CheckCollision(bounds, tileRect)) {
+                player.sprite.setPosition({player.sprite.getPosition().x, tileRect.position.y - bounds.size.y / 2.0f});
+                player.velocity.y = 0.0f;
+                player.isGround = true;
+            }
+        }
+    }
+}
+
+
+void Player::UpdateState() {
+    if (!isGround) {
+        state = (velocity.y < 0.0f) ? State::Jumping : State::Falling;
+    } else {
+        state = (std::abs(velocity.x) > 10.0f) ? State::Running : State::Idle;
+    }
+}
+
+void Player::Update(const Map& map, const float dt)
+{
+    bool isMoving = false;
+    AccelerationPlayer(*this, dt, isMoving);
+    FrictionPlayer(*this, isMoving);
+    CheckMaxVelocity(*this);
+    sprite.move({velocity.x * dt, 0.0f});
+    ResolveCollisionsX(map);
+
+    GravityPlayer(*this, dt);
+    sprite.move({0.0f, velocity.y * dt});
+    ResolveCollisionsY(map);
+
+    SpriteFlipping(*this);
+    UpdateJerkTimer(jerkTimer, dt);
+    UpdateState();
+}
+
+void Player::Draw(sf::RenderWindow &window) const
+{
+    window.draw(sprite);
 }
