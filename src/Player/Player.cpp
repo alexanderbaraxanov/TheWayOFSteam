@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include <iostream>
 
 constexpr float ACCELERATION = 1800.0f;
 constexpr float MAX_SPEED = 400.0f;
@@ -76,6 +77,11 @@ void UpdateJerkTimer(float &timer, float dt)
     {
         timer -= dt;
     }
+}
+
+void UpdateHealth(float &health, float dt)
+{
+    health -= 50 * dt; 
 }
 
 static sf::Texture CheckAndLoadTexture(const std::string& filepath)
@@ -187,10 +193,20 @@ void CheckOneWayPlatform(Player& player, sf::FloatRect tileRect, float prevBotto
 
 
 void Player::UpdateState() {
-    if (!isGround) {
-        state = (velocity.y < 0.0f) ? State::Jumping : State::Falling;
-    } else {
-        state = (std::abs(velocity.x) > 10.0f) ? State::Running : State::Idle;
+    if (health < 0)
+    {
+        state = State::Dead;
+    }
+    else
+    {   
+        if (!isGround) 
+        {
+            state = (velocity.y < 0.0f) ? State::Jumping : State::Falling;
+        } 
+        else 
+        {
+            state = (std::abs(velocity.x) > 10.0f) ? State::Running : State::Idle;
+        }
     }
 }
 
@@ -209,10 +225,18 @@ void Player::Update(const Map& map, const float dt)
 
     SpriteFlipping(*this);
     UpdateJerkTimer(jerkTimer, dt);
+    if(map.IsSpike(sprite.getPosition().x, sprite.getPosition().y) && state != State::Dead)
+    {
+        UpdateHealth(health, dt);
+        std::cout << health << std::endl;
+    }
     UpdateState();
 }
 
 void Player::Draw(sf::RenderWindow &window) const
 {
-    window.draw(sprite);
+    if(health > 0)
+    { 
+        window.draw(sprite);
+    }
 }
