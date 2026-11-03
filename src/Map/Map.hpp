@@ -19,7 +19,10 @@ struct Map {
     void Draw(sf::RenderWindow& window) const;
 
     TileType GetTile(float worldX, float worldY) const;
+    void SetTile(float worldX, float worldY, TileType tile, int type) const;
     bool IsSolid (float worldX, float worldY) const;
     bool IsSpike(float worldX, float worldY) const;
+    bool IsJerkCoin(float worldX, float worldY) const;
+    bool IsExit(float worldX, float worldY) const;
     std::vector<sf::FloatRect> GetNearbySolidTiles(const sf::FloatRect& bounds) const;
 };

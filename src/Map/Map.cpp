@@ -46,6 +46,13 @@ Map::Map(const std::vector<std::string>& tileMap)
                     grid[i] = TileType::Spike;
                     break;
                 
+                case '4':
+                    grid[i] = TileType::Exit;
+                    break;
+
+                case '5':
+                    grid[i] = TileType::JerkCoin;
+                    break;
                 }
             }
         }
@@ -62,6 +69,16 @@ bool Map::IsSpike(float worldX, float worldY) const
     return GetTile(worldX, worldY) == TileType::Spike;
 }
 
+bool Map::IsJerkCoin(float worldX, float worldY) const
+{
+    return GetTile(worldX, worldY) == TileType::JerkCoin;
+}
+
+bool Map::IsExit(float worldX, float worldY) const
+{
+    return GetTile(worldX, worldY) == TileType::Exit;
+}
+
 TileType Map::GetTile(float worldX, float worldY) const
 {
     if (CheckPos(worldX, width) || CheckPos(worldY, height))
@@ -74,6 +91,36 @@ TileType Map::GetTile(float worldX, float worldY) const
     size_t index = (row * width) + col;
 
     return grid[index];
+}
+
+void Map::SetTile(float worldX, float worldY, TileType tile, int type) const //переделать
+{
+    switch (type)
+        {
+        case '0':
+            tile = TileType::Empty;
+            break;
+
+        case '1':
+            tile = TileType::Solid;
+            break;
+
+        case '2':
+            tile = TileType::Platform;
+            break;
+
+        case '3':
+            tile = TileType::Spike;
+            break;
+        
+        case '4':
+            tile = TileType::Exit;
+            break;
+
+        case '5':
+            tile = TileType::JerkCoin;
+            break;
+        }
 }
 
 sf::IntRect CalculateTileRect(uint32_t tileId, uint32_t tileSize, uint32_t atlasColumns) {

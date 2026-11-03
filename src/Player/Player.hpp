@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include "../Map/Map.hpp"
-#include "./State.hpp"
+#include "./PlayerHandler.hpp"
 
 constexpr float EPSILON = 0.001f;
 
@@ -13,7 +13,7 @@ struct Player {
     sf::Texture texture;        
     sf::Sprite sprite;
     sf::Vector2f velocity = {0.f, 0.f};
-    State state;
+    PlayerState state;
     float gravity = 0.f;
     bool isGround = true;
     int countJerk = 2;
@@ -23,7 +23,7 @@ struct Player {
 
     Player();
     void Update(const Map& map, const float dt);
-    void UpdateHitbox();
+    //void UpdateHitbox();
     void Draw(sf::RenderWindow &window) const;
     void Jump(const sf::Event::KeyPressed* pressedKey);
     void Jerk(const sf::Event::KeyPressed* pressedKey);
@@ -32,4 +32,5 @@ struct Player {
     void ResolveCollisionsY(const Map& map);
     void UpdateState();
 
+    void ResetPhysics();
 };

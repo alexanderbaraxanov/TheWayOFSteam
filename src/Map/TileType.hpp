@@ -3,7 +3,9 @@
 
 enum class TileType : uint8_t {
     Empty = 0,
-    Solid = 1, 
-    Platform = 2,
+    Solid = 1,
+    Platform = 2, 
     Spike = 3,
+    Exit = 4,
+    JerkCoin = 5,
 };

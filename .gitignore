@@ -3,3 +3,4 @@ build/
 *.obj
 .vscode/
 Game/
+TODO.txt

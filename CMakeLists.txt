@@ -10,6 +10,10 @@ add_executable(
     app 
     src/main.cpp
     src/Game/Game.cpp
+    src/Game/GameHandler.cpp
+    src/Game/GameRender.cpp
+    src/Hud/Hud.cpp
+    src/Camera/Camera.cpp
     src/Player/Player.cpp
     src/Shape/Shape.cpp 
     src/Map/Map.cpp 

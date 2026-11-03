@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-enum class State : uint8_t {
+enum class PlayerState : uint8_t {
     Dead = 0,
     Idle  = 1,
     Running = 2,
