@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "../Map/Map.hpp"
 #include "./PlayerHandler.hpp"
+#include "../CollisionHandler/CollisonHandler.hpp"
 
 constexpr float EPSILON = 0.001f;
 
@@ -28,8 +29,6 @@ struct Player {
     void Jump(const sf::Event::KeyPressed* pressedKey);
     void Jerk(const sf::Event::KeyPressed* pressedKey);
 
-    void ResolveCollisionsX(const Map& map);
-    void ResolveCollisionsY(const Map& map);
     void UpdateState();
 
     void ResetPhysics();

@@ -5,7 +5,6 @@ constexpr float ACCELERATION = 1800.0f;
 constexpr float MAX_SPEED = 400.0f;
 constexpr float FRICTION = 0.2f;
 
-constexpr float GROUND_LEVEL = 251.f;
 constexpr float POWER_JUMP = -600.f;
 constexpr float GRAVITY_UP = 1200.f;
 constexpr float GRAVITY_DOWN = 1000.f;
@@ -40,32 +39,6 @@ void CheckMaxVelocity(Player& player)
     }
 }
 
-bool CheckCollision(const sf::FloatRect& a, const sf::FloatRect& b) {
-   return a.findIntersection(b).has_value();
-}
-
-void Player::ResolveCollisionsX(const Map& map) {
-   sf::FloatRect bounds = sprite.getGlobalBounds();
-  
-   for (const auto& tileRect : map.GetNearbySolidTiles(bounds)) {
-        if (CheckCollision(bounds, tileRect)) 
-        {
-            float playerCenterX = sprite.getPosition().x;
-            float tileCenterX = tileRect.position.x + tileRect.size.x / 2.0f;
-            if (velocity.x > 0.0f || (velocity.x == 0.0f && playerCenterX < tileCenterX)) {
-                sprite.setPosition({tileRect.position.x - bounds.size.x / 2.0f - EPSILON, sprite.getPosition().y});
-            } 
-            else if (velocity.x < 0.0f || (velocity.x == 0.0f && playerCenterX > tileCenterX)) 
-            {
-                sprite.setPosition({tileRect.position.x + tileRect.size.x + bounds.size.x / 2.0f + EPSILON, sprite.getPosition().y});
-            }
-            velocity.x = 0.0f; 
-            break;
-        }
-
-   }
-}
-
 void PlayerMoving(Player& player, Map map, float dt)
 {
     bool isMoving = false;
@@ -80,28 +53,6 @@ void GravityPlayer(Player& player, const float dt)
 {
     player.gravity = (player.velocity.y < 0.f) ? GRAVITY_UP : GRAVITY_DOWN;
     player.velocity.y += player.gravity * dt;
-}
-
-void Player::ResolveCollisionsY(const Map& map) {
-   sf::FloatRect bounds = sprite.getGlobalBounds();
-   isGround = false; 
-
-    for (const auto& tileRect : map.GetNearbySolidTiles(bounds)) {
-        if (CheckCollision(bounds, tileRect)) 
-        {
-            if (velocity.y > 0.0f || (velocity.y == 0.0f && sprite.getPosition().y < tileRect.position.y)) 
-            { 
-                sprite.setPosition({sprite.getPosition().x, tileRect.position.y - bounds.size.y / 2.0f});
-                isGround = true;   
-            } 
-            else if (velocity.y < 0.0f) 
-            { 
-                sprite.setPosition({sprite.getPosition().x, tileRect.position.y + tileRect.size.y + bounds.size.y / 2.0f + EPSILON});
-            }
-            velocity.y = 0.0f;
-            break;
-        }
-    }
 }
 
 void PlayerJumping(Player& player, Map map, const float dt)
@@ -131,24 +82,6 @@ void Player::ResetPhysics()
     isGround = false;
     velocity = {0.f, 0.f};
     countJerk = 2;
-}
-
-void UpdateJerkTimer(float &timer, float dt)
-{
-    if (timer > 0.f)
-    {
-        timer -= dt;
-    }
-}
-
-void UpdateHealth(float &health, float dt)
-{
-    health -= 50 * dt; 
-}
-
-void UpdateJerkCounter(int &counter)
-{
-    counter += 1; 
 }
 
 static sf::Texture CheckAndLoadTexture(const std::string& filepath)
@@ -196,21 +129,6 @@ void Player::Jerk(const sf::Event::KeyPressed* pressedKey)
     }
 }
 
-void CheckOneWayPlatform(Player& player, sf::FloatRect tileRect, float prevBottom) {
-   sf::FloatRect bounds = player.sprite.getGlobalBounds();
-
-    if (player.velocity.y > 0.0f) {
-        if (prevBottom <= tileRect.position.y + EPSILON) {
-            if (CheckCollision(bounds, tileRect)) {
-                player.sprite.setPosition({player.sprite.getPosition().x, tileRect.position.y - bounds.size.y / 2.0f});
-                player.velocity.y = 0.0f;
-                player.isGround = true;
-            }
-        }
-    }
-}
-
-
 void Player::UpdateState() {
     if (health < 0)
     {
@@ -227,25 +145,6 @@ void Player::UpdateState() {
             state = (std::abs(velocity.x) > 10.0f) ? PlayerState::Running : PlayerState::Idle;
         }
     }
-}
-
-void Player::Update(const Map& map, const float dt)
-{
-    PlayerMoving(*this, map, dt);
-    PlayerJumping(*this, map, dt);
-
-    SpriteFlipping(*this);
-    if(map.IsSpike(sprite.getPosition().x, sprite.getPosition().y) && state != PlayerState::Dead)
-    {
-        UpdateHealth(health, dt);
-    }
-    if(map.IsJerkCoin(sprite.getPosition().x, sprite.getPosition().y) && state != PlayerState::Dead)
-    {
-        UpdateJerkCounter(countJerk);
-    }
-
-    UpdateJerkTimer(jerkTimer, dt);
-    UpdateState();
 }
 
 void Player::Draw(sf::RenderWindow &window) const
