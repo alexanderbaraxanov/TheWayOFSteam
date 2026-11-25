@@ -19,7 +19,6 @@ add_executable(
     src/Player/PlayerUpdate.cpp
     src/Map/Map.cpp 
     src/CollisionHandler/CollisionHandler.cpp
-    src/Enviroment/Sounds.cpp
     src/Game/Coin.cpp
     src/Animation/Animation.cpp
 )

@@ -1,20 +1,10 @@
 #include "Map.hpp"
-#include "fstream"
-#include "iostream"
+
+#include "../Game/Game.hpp"
 
 bool CheckPos(float worldPos, float boundMap)
 {
     return (worldPos < 0 || worldPos > boundMap * TILE_SIZE);
-}
-
-static sf::Texture CheckAndLoadTexture(const std::string& filepath)
-{
-    sf::Texture texture;
-    if (!texture.loadFromFile(filepath)) 
-    {
-        throw std::runtime_error("CRITICAL: Не удалось загрузить: " + filepath);
-    }
-    return texture;
 }
 
 std::vector<std::string> LoadMapByTxt(const std::string &filepath) 
@@ -40,11 +30,12 @@ std::vector<std::string> LoadMapByTxt(const std::string &filepath)
     return mapByVector;
 }
 
-Map::Map(const std::string &filepath)
+Map::Map(const std::string &filepath, Game& game)
     : height(MAP_HEIGHT)
     , width(MAP_WIDTH)
-    , tilesetTexture(CheckAndLoadTexture("../assets/tileset.png"))
+    , tileSprite(game.textures.tilesetTexture)
 {
+    atlasColumns = game.textures.tilesetTexture.getSize().x / TILE_SIZE;
     std::vector<std::string> tileMap = LoadMapByTxt(filepath);
     grid.resize(width * height, TileType::Empty);
     for (size_t y = 0; y < height; y++)
@@ -157,12 +148,8 @@ sf::IntRect CalculateTileRect(uint32_t tileId, uint32_t tileSize, uint32_t atlas
 }
 
 
-void Map::Draw(sf::RenderWindow& window) const 
+void Map::Draw(sf::RenderWindow& window) 
 {
-    sf::Sprite tileSprite(tilesetTexture);
-
-    const uint32_t atlasColumns = tilesetTexture.getSize().x / TILE_SIZE; 
-
     for (size_t i = 0; i < grid.size(); ++i) {
         if (grid[i] == TileType::Empty) continue;
 

@@ -5,7 +5,9 @@
 #include <algorithm>
 #include "../Map/Map.hpp"
 #include "./PlayerState.hpp"
-#include "../Enviroment/Sounds.hpp"
+#include "../SoundManager/Sounds.hpp"
+
+class Game;
 
 constexpr int FRAME_PLAYER_WIDTH = 80;
 constexpr int FRAME_PLAYER_HEIGHT = 112;
@@ -23,8 +25,7 @@ struct Player {
     PlayerState state;
     float health = 0.f;
 
-    int currentFrame; 
-    sf::Texture texture;       
+    int currentFrame;       
     sf::Sprite sprite;
 
     SoundBank sounds;
@@ -38,7 +39,7 @@ struct Player {
     float dashTimer = 0.f;
     float animationTimer = 0.f;
 
-    Player();
+    Player(Game& game);
     void Update(const Map& map, const float dt);
     void UpdateAnimation(float dt);
     void InitGraphics(int frameWidth, int frameHeight);

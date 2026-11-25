@@ -63,6 +63,7 @@ void Player::ResetPhysics()
     health = 100.f;
     sprite.setOrigin({sprite.getLocalBounds().size.x / 2.0f, sprite.getLocalBounds().size.y / 2.0f});
     sprite.setPosition({100.f, 800.f});
+    hitbox.position = sprite.getPosition();
     isGround = false;
     velocity = {0.f, 0.f};
     countDash = 10;

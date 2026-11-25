@@ -38,6 +38,7 @@ void Player::PlayerMoving(const Map& map, float dt)
     FrictionPlayer(*this, isMoving);
     CheckMaxVelocity(*this);
     sprite.move({velocity.x * dt, 0.0f});
+    hitbox.position.x = sprite.getPosition().x;
     Collison::ResolveCollisionsX(map, *this);
     if(isGround && isMoving && sounds.runSound.getStatus() != sf::Sound::Status::Playing)
     {
@@ -55,6 +56,7 @@ void Player::PlayerJumping(const Map& map, const float dt)
 {
     GravityPlayer(*this, dt);
     sprite.move({0.0f, velocity.y * dt});
+    hitbox.position.y = sprite.getPosition().y;
     Collison::ResolveCollisionsY(map, *this);
 }
 

@@ -1,25 +1,16 @@
 #include "Player.hpp"
-#include <iostream>
+#include "../Game/Game.hpp"
 
-static sf::Texture CheckAndLoadTexture(const std::string& filepath)
-{
-    sf::Texture texture;
-    if (!texture.loadFromFile(filepath)) 
-    {
-        throw std::runtime_error("CRITICAL: Не удалось загрузить: " + filepath);
-    }
-    return texture;
-}
-
-Player::Player()
-    : texture(CheckAndLoadTexture("../assets/player.png"))
-    , sprite(texture)
+Player::Player(Game& game)
+    : sprite(game.textures.playerTexture)
 {
     health = 100.f;
     currentFrame = 0;
     sprite.setOrigin({sprite.getLocalBounds().size.x / 2.0f, sprite.getLocalBounds().size.y / 2.0f});
     InitGraphics(48, 98);
-    sprite.setPosition({100.f, 800.f}); 
+    sprite.setPosition({100.f, 600.f}); 
+    hitbox.position = {sprite.getGlobalBounds().position.x, sprite.getGlobalBounds().position.y - 50.f};
+    hitbox.size = {sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y};
 }    
 
 void Player::UpdateState() {
