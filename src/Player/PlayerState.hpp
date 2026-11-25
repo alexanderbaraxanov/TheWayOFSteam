@@ -7,4 +7,6 @@ enum class PlayerState : uint8_t {
     Running = 2,
     Jumping = 3,
     Falling = 4,
+    Dashing = 5,
+    Hitting = 6,
 };

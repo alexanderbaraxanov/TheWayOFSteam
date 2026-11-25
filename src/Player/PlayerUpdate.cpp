@@ -1,4 +1,6 @@
-void UpdateJerkTimer(float &timer, float dt)
+#include "Player.hpp"
+
+void UpdateDashTimer(float &timer, float dt)
 {
     if (timer > 0.f)
     {
@@ -6,31 +8,62 @@ void UpdateJerkTimer(float &timer, float dt)
     }
 }
 
-void UpdateHealth(float &health, float dt)
+void DicrementHealth(float &health, float dHP)
 {
-    health -= 50 * dt; //переписать функцию для урона
+    health -= dHP; 
 }
 
-void UpdateJerkCounter(int &counter) //dash перименовать 
+void IncrementHealth(float &health, float dHP)
+{
+    health += dHP; 
+}
+
+void IncrementDashCounter(int &counter) 
 {
     counter += 1; 
 }
 
+void SpriteFlipping(Player& player)
+{
+    if (player.velocity.x > 10.0f)
+    {
+        player.sprite.setScale({1.0f, 1.0f});
+    }
+    else if (player.velocity.x < -10.0f)
+    {
+        player.sprite.setScale({-1.0f, 1.0f});
+    }
+}
+
 void Player::Update(const Map& map, const float dt)
 {
-    PlayerMoving(*this, map, dt);
-    PlayerJumping(*this, map, dt);
+    PlayerMoving(map, dt);
+    PlayerJumping(map, dt);
 
     SpriteFlipping(*this);
     if(map.IsSpike(sprite.getPosition().x, sprite.getPosition().y) && state != PlayerState::Dead)
     {
-        UpdateHealth(health, dt);
+        velocity.y = POWER_JUMP;
+        isGround = false;
+        DicrementHealth(health, 30);
     }
-    if(map.IsJerkCoin(sprite.getPosition().x, sprite.getPosition().y) && state != PlayerState::Dead)
+    if(map.IsDashCoin(sprite.getPosition().x, sprite.getPosition().y) && state != PlayerState::Dead)
     {
-        UpdateJerkCounter(countJerk);
+        IncrementDashCounter(countDash);
     }
-
-    UpdateJerkTimer(jerkTimer, dt);
+    
     UpdateState();
+    UpdateAnimation(dt);
+
+    UpdateDashTimer(dashTimer, dt);
+}
+
+void Player::ResetPhysics()
+{
+    health = 100.f;
+    sprite.setOrigin({sprite.getLocalBounds().size.x / 2.0f, sprite.getLocalBounds().size.y / 2.0f});
+    sprite.setPosition({100.f, 800.f});
+    isGround = false;
+    velocity = {0.f, 0.f};
+    countDash = 10;
 }

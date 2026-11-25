@@ -1,4 +1,6 @@
 #include "Map.hpp"
+#include "fstream"
+#include "iostream"
 
 bool CheckPos(float worldPos, float boundMap)
 {
@@ -15,11 +17,35 @@ static sf::Texture CheckAndLoadTexture(const std::string& filepath)
     return texture;
 }
 
-Map::Map(const std::vector<std::string>& tileMap)
+std::vector<std::string> LoadMapByTxt(const std::string &filepath) 
+{
+    std::vector<std::string> mapByVector;
+    std::ifstream file(filepath);
+
+    if (!file.is_open()) 
+    {
+        throw std::runtime_error("CRITICAL: Failed level file: " + filepath);
+    }
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+        mapByVector.push_back(line);
+    }
+
+    return mapByVector;
+}
+
+Map::Map(const std::string &filepath)
     : height(MAP_HEIGHT)
     , width(MAP_WIDTH)
     , tilesetTexture(CheckAndLoadTexture("../assets/tileset.png"))
 {
+    std::vector<std::string> tileMap = LoadMapByTxt(filepath);
     grid.resize(width * height, TileType::Empty);
     for (size_t y = 0; y < height; y++)
     {
@@ -51,7 +77,7 @@ Map::Map(const std::vector<std::string>& tileMap)
                     break;
 
                 case '5':
-                    grid[i] = TileType::JerkCoin;
+                    grid[i] = TileType::DashCoin;
                     break;
                 }
             }
@@ -69,9 +95,9 @@ bool Map::IsSpike(float worldX, float worldY) const
     return GetTile(worldX, worldY) == TileType::Spike;
 }
 
-bool Map::IsJerkCoin(float worldX, float worldY) const
+bool Map::IsDashCoin(float worldX, float worldY) const
 {
-    return GetTile(worldX, worldY) == TileType::JerkCoin;
+    return GetTile(worldX, worldY) == TileType::DashCoin;
 }
 
 bool Map::IsExit(float worldX, float worldY) const
@@ -118,7 +144,7 @@ void Map::SetTile(float worldX, float worldY, TileType tile, int type) const //Ð
             break;
 
         case '5':
-            tile = TileType::JerkCoin;
+            tile = TileType::DashCoin;
             break;
         }
 }

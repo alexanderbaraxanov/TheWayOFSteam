@@ -3,9 +3,10 @@
 
 struct Hud {
     sf::Font font;              
-    sf::Text hudText; 
+    sf::Text healthPoint;
+    sf::Text dashCount; 
     
     Hud();
-    void UpdateHud(int health);
+    void UpdateHud(int HP, int DC);
     void Draw(sf::RenderWindow &window);
 };

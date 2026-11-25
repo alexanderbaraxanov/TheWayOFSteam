@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include "../Player/Player.hpp"
-#include "../Shape/Shape.hpp"
 #include "../Map/Map.hpp"
 #include <SFML/System/Vector2.hpp>
 

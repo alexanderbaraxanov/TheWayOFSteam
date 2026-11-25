@@ -7,7 +7,7 @@ void CameraController::CreateWorldView(sf::Vector2f windowSize, sf::Vector2f pla
     camera = sf::View(sf::FloatRect({0.0f, 0.0f}, windowSize));
     camera.setCenter(playerWorldPos);   
     camera.setSize(windowSize); 
-    smoothness = 1.3f;
+    smoothness = 3.f;
     leadDistance = 80.f;
 }
 

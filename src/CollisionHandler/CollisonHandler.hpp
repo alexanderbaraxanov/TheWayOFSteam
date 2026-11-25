@@ -1,12 +1,12 @@
 #pragma once
-#include "../Player/Player.hpp"
+
+#include <SFML/Graphics.hpp>
 #include "../Map/Map.hpp"
 
+struct Player;
 
-struct Collision {
-    Player& player;
-    Map& map;
-
-    void ResolveCollisionsX(const Map& map);
-    void ResolveCollisionsY(const Map& map);
-};
+namespace Collison 
+{
+    void ResolveCollisionsX(const Map& map, Player& player);
+    void ResolveCollisionsY(const Map& map, Player& player);
+}
